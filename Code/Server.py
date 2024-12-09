@@ -1,82 +1,63 @@
-# import socket
-
-# # Server configuration
-# HOST = '127.0.0.1'  # Localhost
-# PORT = 65432        # Port to listen on (use ports > 1023)
-
-# # Create a socket
-# server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# # Bind the socket to the address and port
-# server_socket.bind((HOST, PORT))
-
-# # Listen for incoming connections
-# server_socket.listen()
-# print(f"Server is listening on {HOST}:{PORT}")
-
-# # Accept a connection
-# conn, addr = server_socket.accept()
-# print(f"Connected by {addr}")
-
-# # Handle client connection
-# with conn:
-#     while True:
-#         # Receive message from client
-#         client_message = conn.recv(1024)  # Buffer size 1024 bytes
-#         if not client_message:
-#             print("Client disconnected.")
-#             break
-#         print(f"Client: {client_message.decode()}")
-
-#         # Send a response to the client
-#         server_message = input("Server: ")
-#         conn.sendall(server_message.encode())
 import socket
 import threading
 
 # Server configuration
-HOST = '127.0.0.1'  # Localhost
-PORT = 65432        # Port to listen on (use ports > 1023)
+HOST = '127.0.0.1'
+PORT = 65432
 
-# Create a socket
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# Bind the socket to the address and port
-server_socket.bind((HOST, PORT))
-
-# Listen for incoming connections
-server_socket.listen(2)
-print(f"Server is listening on {HOST}:{PORT}")
-
+# List to store connected clients
 clients = []
 
-def handle_client(client_socket, other_client_socket):
+
+def handle_client(sender, receivers):
+    """Receive messages from `sender` and broadcast them to `receivers`."""
     while True:
         try:
-            message = client_socket.recv(1024)
+            # Receive message from the sender
+            message = sender.recv(1024)
             if not message:
                 print("A client disconnected.")
-                other_client_socket.sendall(b"Client disconnected.")
                 break
-            other_client_socket.sendall(message)
-        except:
+
+            # Broadcast the message to all receivers
+            for receiver in receivers:
+                receiver.sendall(message)
+        except Exception as e:
+            print(f"Error handling client: {e}")
             break
-    client_socket.close()
 
-# Accept two client connections
-for i in range(2):
-    conn, addr = server_socket.accept()
-    clients.append(conn)
-    print(f"Client {i+1} connected by {addr}")
 
-# Start threads to handle clients
-thread1 = threading.Thread(target=handle_client, args=(clients[0], clients[1]))
-thread2 = threading.Thread(target=handle_client, args=(clients[1], clients[0]))
+# Create a server socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((HOST, PORT))
+server_socket.listen(5)
+print(f"Server running on {HOST}:{PORT}")
 
-thread1.start()
-thread2.start()
+try:
+    # Accept exactly three clients
+    while len(clients) < 3:
+        client_socket, address = server_socket.accept()
+        clients.append(client_socket)
+        print(f"Client {address} connected.")
 
-thread1.join()
-thread2.join()
+    print("All three clients connected. Starting communication.")
 
-server_socket.close()
+    # Create threads to manage communication
+    thread1 = threading.Thread(target=handle_client, args=(clients[0], [clients[1], clients[2]]), daemon=True)
+    thread2 = threading.Thread(target=handle_client, args=(clients[1], [clients[0], clients[2]]), daemon=True)
+    thread3 = threading.Thread(target=handle_client, args=(clients[2], [clients[0], clients[1]]), daemon=True)
+
+    thread1.start()
+    thread2.start()
+    thread3.start()
+
+    # Wait for threads to finish (optional; useful for cleanup)
+    thread1.join()
+    thread2.join()
+    thread3.join()
+except KeyboardInterrupt:
+    print("Server shutting down.")
+finally:
+    for client in clients:
+        client.close()
+    server_socket.close()

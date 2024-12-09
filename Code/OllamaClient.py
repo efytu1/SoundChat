@@ -15,47 +15,42 @@ response = client.chat(model='llama3.2', messages=[
 
 import socket
 import threading
-from ollama import Client
+from ollama import chat
+from ollama import ChatResponse
 
 # Server configuration
 HOST = '127.0.0.1'  # Server's hostname or IP address
 PORT = 65432        # Port used by the server
 
 # Create a socket
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+observer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Connect to the server
-client_socket.connect((HOST, PORT))
+observer_socket.connect((HOST, PORT))
 print(f"Connected to server at {HOST}:{PORT}")
 
-def receive_messages():
+def observe():
     while True:
         try:
-            # Receive message from the other client
-            message = client_socket.recv(1024)
-            if not message:
+            # Receive message from the other clients
+            getMessage = observer_socket.recv(1024)
+            if not getMessage:
                 print("Connection closed by the server.")
                 break
-            print(f"Friend: {message.decode()}")
+            print(f"Observed: {getMessage.decode()}")
         except:
             break
 
 # Start a thread to listen for incoming messages
-receive_thread = threading.Thread(target=receive_messages)
-receive_thread.start()
+observer_thread = threading.Thread(target=observe, daemon=True)
+observer_thread.start()
 
+# The client will only observe; no input or sending of messages.
 try:
-    while True:
-        # Send a message to the other client
-        message = input()
-        client_socket.sendall(message.encode())
-
-        # Exit if the user types "exit"
-        if message.lower() == 'exit':
-            print("Exiting chat.")
-            break
-except:
-    pass
+    # Keep the main thread alive to allow observation
+    observer_thread.join()
+except KeyboardInterrupt:
+    print("Exiting observer mode.")
 finally:
-    client_socket.close()
+    observer_socket.close()
     print("Connection closed.")
