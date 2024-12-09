@@ -17,6 +17,7 @@ import socket
 import threading
 from ollama import chat
 from ollama import ChatResponse
+from ollama import Client
 
 # Server configuration
 HOST = '127.0.0.1'  # Server's hostname or IP address
@@ -29,6 +30,17 @@ observer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 observer_socket.connect((HOST, PORT))
 print(f"Connected to server at {HOST}:{PORT}")
 
+client = Client(
+  host='http://localhost:11434',
+  headers={'x-some-header': 'some-value'}
+)
+response = client.chat(model='llama3.2', messages=[
+  {
+    'role': 'user',
+    'content': 'Why is the sky blue?',
+  },
+])
+
 def observe():
     while True:
         try:
@@ -37,7 +49,13 @@ def observe():
             if not getMessage:
                 print("Connection closed by the server.")
                 break
-            print(f"Observed: {getMessage.decode()}")
+            response = client.chat(model='llama3.2', messages=[
+                {
+                    'role': 'user',
+                    'content': f'Describe the sentiment of this sentence with one of (high positive, low positive, high negative, low negative) : {getMessage.decode()}',
+                },
+            ])
+            print(response.message.content)
         except:
             break
 
