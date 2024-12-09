@@ -1,81 +1,86 @@
-# import socket
+'''
+import socket
 
-# # Server configuration
-# HOST = '127.0.0.1'  # Server's hostname or IP address
-# PORT = 65432        # Port used by the server
+# Server configuration
+HOST = '127.0.0.1'  # Server's hostname or IP address
+PORT = 65432        # Port used by the server
 
-# # Create a socket
-# client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Create a socket
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# # Connect to the server
-# client_socket.connect((HOST, PORT))
-# print(f"Connected to server at {HOST}:{PORT}")
+# Connect to the server
+client_socket.connect((HOST, PORT))
+print(f"Connected to server at {HOST}:{PORT}")
 
-# # Send and receive data
-# try:
-#     while True:
-#         # Send a message to the server
-#         client_message = input("Client: ")
-#         client_socket.sendall(client_message.encode())
+# Send and receive data
+try:
+    while True:
+        # Send a message to the server
+        client_message = input("Client: ")
+        client_socket.sendall(client_message.encode())
 
-#         # Exit loop if the user types "exit"
-#         if client_message.lower() == 'exit':
-#             print("Exiting chat.")
-#             break
+        # Exit loop if the user types "exit"
+        if client_message.lower() == 'exit':
+            print("Exiting chat.")
+            break
 
-#         # Receive a response from the server
-#         server_message = client_socket.recv(1024)  # Buffer size 1024 bytes
-#         print(f"Server: {server_message.decode()}")
-# finally:
-#     client_socket.close()
-#     print("Connection closed.")
-######################################################################################
-# import socket
-# import threading
+        # Receive a response from the server
+        server_message = client_socket.recv(1024)  # Buffer size 1024 bytes
+        print(f"Server: {server_message.decode()}")
+finally:
+    client_socket.close()
+    print("Connection closed.")
+'''
 
-# # Server configuration
-# HOST = '127.0.0.1'  # Server's hostname or IP address
-# PORT = 65432        # Port used by the server
 
-# # Create a socket
-# client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+import socket
+import threading
 
-# # Connect to the server
-# client_socket.connect((HOST, PORT))
-# print(f"Connected to server at {HOST}:{PORT}")
+# Server configuration
+HOST = '127.0.0.1'  # Server's hostname or IP address
+PORT = 65432        # Port used by the server
 
-# def receive_messages():
-#     while True:
-#         try:
-#             # Receive message from the other client
-#             message = client_socket.recv(1024)
-#             if not message:
-#                 print("Connection closed by the server.")
-#                 break
-#             print(f"Friend: {message.decode()}")
-#         except:
-#             break
+# Create a socket
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# # Start a thread to listen for incoming messages
-# receive_thread = threading.Thread(target=receive_messages)
-# receive_thread.start()
+# Connect to the server
+client_socket.connect((HOST, PORT))
+print(f"Connected to server at {HOST}:{PORT}")
 
-# try:
-#     while True:
-#         # Send a message to the other client
-#         message = input()
-#         client_socket.sendall(message.encode())
+def receive_messages():
+    while True:
+        try:
+            # Receive message from the other client
+            message = client_socket.recv(1024)
+            if not message:
+                print("Connection closed by the server.")
+                break
+            print(f"Friend: {message.decode()}")
+        except:
+            break
 
-#         # Exit if the user types "exit"
-#         if message.lower() == 'exit':
-#             print("Exiting chat.")
-#             break
-# except:
-#     pass
-# finally:
-#     client_socket.close()
-#     print("Connection closed.")
-#######################################################################
+# Start a thread to listen for incoming messages
+receive_thread = threading.Thread(target=receive_messages)
+receive_thread.start()
+
+try:
+    while True:
+        # Send a message to the other client
+        message = input()
+        client_socket.sendall(message.encode())
+
+        # Exit if the user types "exit"
+        if message.lower() == 'exit':
+            print("Exiting chat.")
+            break
+except:
+    pass
+finally:
+    client_socket.close()
+    print("Connection closed.")
+
+
+'''
 import socket
 import threading
 import pygame
@@ -181,3 +186,4 @@ finally:
     client_socket.close()
     pygame.mixer.quit()
     print("Connection closed.")
+'''
