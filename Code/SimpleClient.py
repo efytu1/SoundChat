@@ -1,23 +1,5 @@
-'''
-from ollama import Client
-client = Client(
-  host='http://localhost:11434',
-  headers={'x-some-header': 'some-value'}
-)
-response = client.chat(model='llama3.2', messages=[
-  {
-    'role': 'user',
-    'content': 'Why is the sky blue?',
-  },
-])
-'''
-
-
 import socket
 import threading
-from ollama import chat
-from ollama import ChatResponse
-from ollama import Client
 
 # Server configuration
 HOST = '127.0.0.1'  # Server's hostname or IP address
@@ -30,17 +12,6 @@ observer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 observer_socket.connect((HOST, PORT))
 print(f"Connected to server at {HOST}:{PORT}")
 
-client = Client(
-  host='http://localhost:11434',
-  headers={'x-some-header': 'some-value'}
-)
-response = client.chat(model='llama3.2', messages=[
-  {
-    'role': 'user',
-    'content': 'Why is the sky blue?'
-  },
-])
-
 def observe():
     while True:
         try:
@@ -49,13 +20,25 @@ def observe():
             if not getMessage:
                 print("Connection closed by the server.")
                 break
-            response = client.chat(model='llama3.2', messages=[
-                {
-                    'role': 'user',
-                    'content': f'Describe the sentiment of this sentence with one of (high positive, low positive, high negative, low negative) : {getMessage.decode()}',
-                },
-            ])
-            print(response.message.content)
+
+            # Trigger words for AI
+            highP = ["happy", "excited", "party", "fun", "love"]
+            lowP = ["calm", "relaxed", "content", "satisfied", "chill"]
+            highN = ["angry", "worried", "hate", "disgusted", "frustrated", "died"]
+            lowN = ["upset", "bored", "depressed"]
+
+            message = getMessage.decode()
+            if any (x in message for x in highP):
+                print("High positive")
+            elif any (x in message for x in lowP):
+                print("Low positive")
+            elif any (x in message for x in highN):
+                print("High negative")
+            elif any (x in message for x in lowN):
+                print("Low negative")
+            else:
+                print("No sentiment found")
+
         except:
             break
 
