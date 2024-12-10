@@ -23,9 +23,9 @@ def observe():
 
             # Trigger words for AI
             highP = ["happy", "excited", "party", "fun", "love"]
-            lowP = ["calm", "relaxed", "content", "satisfied", "chill"]
-            highN = ["angry", "worried", "hate", "disgusted", "frustrated", "died"]
-            lowN = ["upset", "bored", "depressed"]
+            lowP = ["calm", "relaxed", "content", "satisfied", "chill", "nice", "glad"]
+            highN = ["angry", "worried", "hate", "disgusted", "frustrated", "died", "heartbroken"]
+            lowN = ["upset", "bored", "depressed", "sad", "miserable", "tired"]
 
             message = getMessage.decode()
             if any (x in message for x in highP):
