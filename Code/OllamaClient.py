@@ -20,7 +20,7 @@ from ollama import ChatResponse
 from ollama import Client
 
 # Server configuration
-HOST = '127.0.0.1'  # Server's hostname or IP address
+HOST = '10.15.245.226'  # Server's hostname or IP address
 PORT = 65432        # Port used by the server
 
 # Create a socket
