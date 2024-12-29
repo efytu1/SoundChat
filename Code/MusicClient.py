@@ -140,7 +140,6 @@ finally:
     observer_socket.close()
     print("Connection closed.")
 
-'''
 # Main loop for user input
 print("Enter a stem key to toggle the sound, or 'vol <key> <value>' to adjust volume, or 'quit' to exit:")
 while True:
@@ -165,7 +164,6 @@ while True:
             print("Invalid volume command. Use 'vol <key> <value>'.")
     else:
         toggle_stem(user_input)
-'''
 
 # Ensure all sounds are stopped before quitting
 for sound in playing_sounds.values():

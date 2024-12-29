@@ -8,7 +8,6 @@ PORT = 65432
 # List to store connected clients
 clients = []
 
-
 def handle_client(sender, receivers):
     """Receive messages from `sender` and broadcast them to `receivers`."""
     while True:
@@ -25,7 +24,6 @@ def handle_client(sender, receivers):
         except Exception as e:
             print(f"Error handling client: {e}")
             break
-
 
 # Create a server socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
